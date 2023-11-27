@@ -39,16 +39,22 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
                 "Unable to access binding. Is view created"
             }
 
+    // location objects to fetch and retrieve location updates
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
+    // location variables to store current location and permission grants
     private var currentLocation: Location? = null
     private var locationPermissionGranted: Boolean = false
 
     private lateinit var map: GoogleMap
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
 
+    /**
+     * This variable refers to the popup that asks the user
+     * if he/she allows the app to access his/her location
+     */
     @SuppressLint("MissingPermission")
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         locationPermissionGranted = permissions.entries.all {
@@ -56,6 +62,7 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (locationPermissionGranted) {
+            // starts requesting for location updates
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
     }
@@ -63,16 +70,19 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlacesBinding.inflate(inflater, container, false)
 
+        // checks that the phones location services are enabled
         if (!locationEnabled()) {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
         }
 
+        // configuration object for requesting location updates
         locationRequest = LocationRequest.create().apply {
             interval = 10000
             priority = Priority.PRIORITY_HIGH_ACCURACY
         }
 
+        // the function that gets called when location requests are returned
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
@@ -82,6 +92,9 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
                     Log.d(TAG, "$currentLocation")
                     updateMapLocation(currentLocation)
                     updateMapUI()
+                    // once we get a location, we can stop requesting for updates
+                    // if we do not do this, the phone will continually check for updates
+                    // which will use battery power
                     fusedLocationProviderClient.removeLocationUpdates(locationCallback)
                 }
             }
@@ -89,13 +102,14 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
+        // checking if the app has the appropriate permissions
         if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             && ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         ) {
             locationPermissionGranted = true
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
-        else {
+        else { // launch the dialog requesting for permissions
             permissionLauncher.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION))
         }
 
@@ -108,6 +122,9 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
         binding.mapView.getMapAsync(this)
     }
 
+    /**
+     * function that checks if location services is enabled
+     */
     private fun locationEnabled(): Boolean {
         val locationManager: LocationManager = this.requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)

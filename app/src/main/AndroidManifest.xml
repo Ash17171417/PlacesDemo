@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--Not sure if you need me -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--But definitely add the two of us -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
@@ -17,6 +20,7 @@
         android:theme="@style/Theme.PlacesDemo"
         tools:targetApi="31">
 
+        <!-- Don't forget us two so the map can work! -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
