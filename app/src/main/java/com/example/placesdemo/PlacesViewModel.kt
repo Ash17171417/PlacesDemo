@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 
 class PlacesViewModel : ViewModel() {
 
-    val markerLocations = MutableLiveData<List<MarkLocation>>()
+    val markLocations = MutableLiveData<List<MarkLocation>>()
 
-    fun addMarkerLocation(markerLocation: MarkLocation) {
-        val currentList = markerLocations.value.orEmpty().toMutableList()
-        currentList.add(markerLocation)
-        markerLocations.value = currentList
+    fun addMarkLocation(markLocation: MarkLocation) {
+        val currentList = markLocations.value.orEmpty().toMutableList()
+        currentList.add(markLocation)
+        markLocations.value = currentList
     }
 }

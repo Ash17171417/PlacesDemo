@@ -10,10 +10,10 @@ import com.example.placesdemo.databinding.PlacesListItemBinding
 class MarkerAdapter : ListAdapter<MarkLocation, MarkerAdapter.MarkerViewHolder>(MarkerDiffCallback()) {
 
     class MarkerViewHolder(private val binding: PlacesListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(markerLocation: MarkLocation) {
-            binding.placesLatitude.text = "Latitude: ${markerLocation.latitude}"
-            binding.placesLongitude.text = "Longitude: ${markerLocation.longitude}"
-            binding.placesAddress.text = "Address: ${markerLocation.address}"
+        fun bind(markLocation: MarkLocation) {
+            binding.placesLatitude.text = "Latitude: ${markLocation.latitude}"
+            binding.placesLongitude.text = "Longitude: ${markLocation.longitude}"
+            binding.placesAddress.text = "Address: ${markLocation.address}"
         }
     }
 

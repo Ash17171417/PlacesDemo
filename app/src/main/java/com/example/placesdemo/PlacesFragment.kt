@@ -139,7 +139,7 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
         binding.placesRecyclerView.adapter = markerAdapter
         binding.placesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        placesViewModel.markerLocations.observe(viewLifecycleOwner, Observer { updatedLocations ->
+        placesViewModel.markLocations.observe(viewLifecycleOwner, Observer { updatedLocations ->
             markerAdapter.submitList(updatedLocations)
         })
     }
@@ -159,8 +159,8 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addMarkerToList(latLng: LatLng, address: String, placeName: String) {
-        val markerLocation = MarkLocation(latLng.latitude, latLng.longitude, address, placeName)
-        placesViewModel.addMarkerLocation(markerLocation)
+        val markLocation = MarkLocation(latLng.latitude, latLng.longitude, address, placeName)
+        placesViewModel.addMarkLocation(markLocation)
         binding.placesLabel.text = placeName
     }
 
