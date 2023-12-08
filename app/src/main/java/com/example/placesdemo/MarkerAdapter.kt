@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.placesdemo.databinding.PlacesListItemBinding
 
-class MarkerAdapter : ListAdapter<MarkerLocation, MarkerAdapter.MarkerViewHolder>(MarkerDiffCallback()) {
+class MarkerAdapter : ListAdapter<MarkLocation, MarkerAdapter.MarkerViewHolder>(MarkerDiffCallback()) {
 
     class MarkerViewHolder(private val binding: PlacesListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(markerLocation: MarkerLocation) {
+        fun bind(markerLocation: MarkLocation) {
             binding.placesLatitude.text = "Latitude: ${markerLocation.latitude}"
             binding.placesLongitude.text = "Longitude: ${markerLocation.longitude}"
             binding.placesAddress.text = "Address: ${markerLocation.address}"
@@ -27,12 +27,12 @@ class MarkerAdapter : ListAdapter<MarkerLocation, MarkerAdapter.MarkerViewHolder
         holder.bind(getItem(position))
     }
 
-    private class MarkerDiffCallback : DiffUtil.ItemCallback<MarkerLocation>() {
-        override fun areItemsTheSame(oldItem: MarkerLocation, newItem: MarkerLocation): Boolean {
+    private class MarkerDiffCallback : DiffUtil.ItemCallback<MarkLocation>() {
+        override fun areItemsTheSame(oldItem: MarkLocation, newItem: MarkLocation): Boolean {
             return oldItem.latitude == newItem.latitude && oldItem.longitude == newItem.longitude
         }
 
-        override fun areContentsTheSame(oldItem: MarkerLocation, newItem: MarkerLocation): Boolean {
+        override fun areContentsTheSame(oldItem: MarkLocation, newItem: MarkLocation): Boolean {
             return oldItem == newItem
         }
     }

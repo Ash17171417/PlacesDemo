@@ -159,7 +159,7 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addMarkerToList(latLng: LatLng, address: String, placeName: String) {
-        val markerLocation = MarkerLocation(latLng.latitude, latLng.longitude, address, placeName)
+        val markerLocation = MarkLocation(latLng.latitude, latLng.longitude, address, placeName)
         placesViewModel.addMarkerLocation(markerLocation)
         binding.placesLabel.text = placeName
     }
