@@ -11,20 +11,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.15"
+        app:layout_constraintVertical_bias="0.043"
         tools:text="Hello" />
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_view"
         android:layout_width="275dp"
         android:layout_height="275dp"
+        app:layout_constraintBottom_toTopOf="@+id/places_recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/places_label" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/places_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="150dp"
-        />
+        tools:listitem="@layout/places_list_item"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

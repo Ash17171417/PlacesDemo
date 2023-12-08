@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -17,6 +19,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.placesdemo.databinding.FragmentPlacesBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -28,11 +34,17 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 private const val TAG = "PlacesFragment"
 private const val DEFAULT_ZOOM = 15f
 
 class PlacesFragment : Fragment(), OnMapReadyCallback {
+    private val placesViewModel: PlacesViewModel by viewModels()
     private var _binding: FragmentPlacesBinding? = null
     private val binding
             get() = checkNotNull(_binding) {
@@ -50,6 +62,8 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
+
+    private lateinit var markerAdapter: MarkerAdapter
 
     /**
      * This variable refers to the popup that asks the user
@@ -120,6 +134,14 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
+
+        markerAdapter = MarkerAdapter()
+        binding.placesRecyclerView.adapter = markerAdapter
+        binding.placesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        placesViewModel.markerLocations.observe(viewLifecycleOwner, Observer { updatedLocations ->
+            markerAdapter.submitList(updatedLocations)
+        })
     }
 
     /**
@@ -132,10 +154,48 @@ class PlacesFragment : Fragment(), OnMapReadyCallback {
     }
 
 
+    private fun addMarkerToMap(latLng: LatLng) {
+        map.addMarker(MarkerOptions().position(latLng).title("Marker"))
+    }
+
+    private fun addMarkerToList(latLng: LatLng, address: String, placeName: String) {
+        val markerLocation = MarkerLocation(latLng.latitude, latLng.longitude, address, placeName)
+        placesViewModel.addMarkerLocation(markerLocation)
+        binding.placesLabel.text = placeName
+    }
+
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         updateMapUI()
         binding.mapView.onResume()
+
+        map.setOnMapClickListener { latLng ->
+            addMarkerToMap(latLng)
+            getAddressFromLocation(latLng)
+        }
+    }
+
+    private fun getAddressFromLocation(latLng: LatLng) {
+        lifecycleScope.launch {
+            val addresses = withContext(Dispatchers.IO) {
+                getAddressesFromGeocoder(latLng)
+            }
+
+            val address = addresses?.firstOrNull()?.getAddressLine(0) ?: "Unknown Address"
+            val placeName = addresses?.firstOrNull()?.featureName ?: "Unknown Place"
+
+            addMarkerToList(latLng, address, placeName)
+        }
+    }
+
+    private fun getAddressesFromGeocoder(latLng: LatLng): List<Address>? {
+        val geocoder = Geocoder(requireContext())
+        return try {
+            geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+        } catch (e: IOException) {
+            Log.e(TAG, "Error getting address from Geocoder: ${e.message}", e)
+            null
+        }
     }
 
     private fun updateMapUI() {
